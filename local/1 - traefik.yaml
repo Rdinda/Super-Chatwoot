@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+
+  traefik:
+    image: traefik:2.11.2
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=minha_rede"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=DEBUG"
+      - "--log.format=common"
+      - "--log.filePath=/var/log/traefik/traefik.log"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access-log"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      placement:
+        constraints:
+          - node.role == manager
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+    networks:
+      - minha_rede
+
+volumes:
+
+  vol_shared:
+    external: true
+    name: volume_swarm_shared
+
+networks:
+
+  minha_rede:
+    driver: overlay
+    attachable: true
+    name: minha_rede
