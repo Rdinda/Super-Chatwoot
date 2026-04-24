@@ -15,12 +15,14 @@ services:
   woofedcrm:
     image: douglara/woofedcrm:development-e8bd47254d620a432e7d3fa729cb4b62cb95fabb
     command: bundle exec rails s -p 3000 -b 0.0.0.0
+    ports:
+      - "3001:3000"
     volumes:
       - woofedcrm_data:/app/public/assets
     networks:
       - minha_rede
     environment:
-      - FRONTEND_URL=http://woofed.localhost
+      - FRONTEND_URL=http://localhost:3001
       - SECRET_KEY_BASE=7a466b84181545c3ab1f03cc45aeae8e031ed950c6dc1d35385fff5b595ad75bc78ff2aa33640049a7fc94a9c83bf1c665ee0eadfda0c79b8ee36ed83263bc8a
       - ENABLE_USER_SIGNUP=true
       - RAILS_ENV=production
@@ -29,7 +31,7 @@ services:
       - RAILS_LOG_LEVEL=debug
       - MOTOR_AUTH_USERNAME=astraonlineweb@gmail.com
       - MOTOR_AUTH_PASSWORD=Mfcd62!!Mfcd62!!
-      - EVOLUTION_API_ENDPOINT=http://api.localhost
+      - EVOLUTION_API_ENDPOINT=http://evolution_astra:8080
       - EVOLUTION_API_ENDPOINT_TOKEN=b45db89a9f853402af79da49a518d8fe
       - DATABASE_URL=postgres://postgres:Mfcd62!!Mfcd62!!@postgrespgvector:5432/woofedcrm
       - REDIS_URL=redis://redis:6379/0
@@ -50,14 +52,6 @@ services:
         limits:
           cpus: "1"
           memory: 1024M
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.woofedcrm.rule=Host(`woofed.localhost`)
-        - traefik.http.routers.woofedcrm.entrypoints=web
-        - traefik.http.routers.woofedcrm.priority=1
-        - traefik.http.routers.woofedcrm.service=woofedcrm
-        - traefik.http.services.woofedcrm.loadbalancer.server.port=3000
-        - traefik.http.services.woofedcrm.loadbalancer.passhostheader=true
 
   sidekiq:
     image: douglara/woofedcrm:development-e8bd47254d620a432e7d3fa729cb4b62cb95fabb
@@ -67,7 +61,7 @@ services:
     networks:
       - minha_rede
     environment:
-      - FRONTEND_URL=http://woofed.localhost
+      - FRONTEND_URL=http://localhost:3001
       - SECRET_KEY_BASE=7a466b84181545c3ab1f03cc45aeae8e031ed950c6dc1d35385fff5b595ad75bc78ff2aa33640049a7fc94a9c83bf1c665ee0eadfda0c79b8ee36ed83263bc8a
       - ENABLE_USER_SIGNUP=true
       - RAILS_ENV=production
@@ -76,7 +70,7 @@ services:
       - RAILS_LOG_LEVEL=debug
       - MOTOR_AUTH_USERNAME=astraonlineweb@gmail.com
       - MOTOR_AUTH_PASSWORD=Mfcd62!!Mfcd62!!
-      - EVOLUTION_API_ENDPOINT=http://api.localhost
+      - EVOLUTION_API_ENDPOINT=http://evolution_astra:8080
       - EVOLUTION_API_ENDPOINT_TOKEN=b45db89a9f853402af79da49a518d8fe
       - DATABASE_URL=postgres://postgres:Mfcd62!!Mfcd62!!@postgrespgvector:5432/woofedcrm
       - REDIS_URL=redis://redis:6379/0
@@ -107,7 +101,7 @@ services:
     networks:
       - minha_rede
     environment:
-      - FRONTEND_URL=http://woofed.localhost
+      - FRONTEND_URL=http://localhost:3001
       - SECRET_KEY_BASE=7a466b84181545c3ab1f03cc45aeae8e031ed950c6dc1d35385fff5b595ad75bc78ff2aa33640049a7fc94a9c83bf1c665ee0eadfda0c79b8ee36ed83263bc8a
       - ENABLE_USER_SIGNUP=true
       - RAILS_ENV=production
@@ -116,7 +110,7 @@ services:
       - RAILS_LOG_LEVEL=debug
       - MOTOR_AUTH_USERNAME=astraonlineweb@gmail.com
       - MOTOR_AUTH_PASSWORD=Mfcd62!!Mfcd62!!
-      - EVOLUTION_API_ENDPOINT=http://api.localhost
+      - EVOLUTION_API_ENDPOINT=http://evolution_astra:8080
       - EVOLUTION_API_ENDPOINT_TOKEN=b45db89a9f853402af79da49a518d8fe
       - DATABASE_URL=postgres://postgres:Mfcd62!!Mfcd62!!@postgrespgvector:5432/woofedcrm
       - REDIS_URL=redis://redis:6379/0

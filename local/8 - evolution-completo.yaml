@@ -4,13 +4,15 @@ services:
   evolution_astra:
     image: atendai/evolution-api:v1.7.0
     command: ["node", "./dist/src/main.js"]
+    ports:
+      - "8080:8080"
     networks:
       - minha_rede
     volumes:
     - evolution_astra_instances:/evolution/instances
     - evolution_astra_store:/evolution/store
     environment:
-      - SERVER_URL=http://api.localhost
+      - SERVER_URL=http://localhost:8080
       - DOCKER_ENV=true
       - LOG_LEVEL=ERROR,WARN,DEBUG,INFO,LOG,VERBOSE,DARK,WEBHOOKS
       - DEL_INSTANCE=false
@@ -30,7 +32,7 @@ services:
       - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true
       - QRCODE_LIMIT=30
       - WEBHOOK_GLOBAL_ENABLED=false
-      - WEBHOOK_GLOBAL_URL=http://n8n-webhook.localhost/
+      - WEBHOOK_GLOBAL_URL=http://n8n_webhook:5678/
       - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
       - WEBHOOK_EVENTS_APPLICATION_STARTUP=false
       - WEBHOOK_EVENTS_QRCODE_UPDATED=true
@@ -79,14 +81,6 @@ services:
         limits:
           cpus: "1"
           memory: 2048M
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.evolution_astra.rule=Host(`api.localhost`)
-        - traefik.http.routers.evolution_astra.entrypoints=web
-        - traefik.http.routers.evolution_astra.priority=1
-        - traefik.http.routers.evolution_astra.service=evolution_astra
-        - traefik.http.services.evolution_astra.loadbalancer.server.port=8080
-        - traefik.http.services.evolution_astra.loadbalancer.passHostHeader=true
 
 volumes:
   evolution_astra_instances:
