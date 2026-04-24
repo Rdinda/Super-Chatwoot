@@ -26,7 +26,7 @@ services:
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
       - SECRET_KEY_BASE=123458bb7ef6402f6a8bcf5d3be54321
-      - FRONTEND_URL=http://chatwoot.localhost
+      - FRONTEND_URL=https://chatwoot.localhost
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
       - ENABLE_ACCOUNT_SIGNUP=false
@@ -66,13 +66,19 @@ services:
           cpus: "1"
           memory: 2048M
       labels:
-        - traefik.enable=true
-        - traefik.http.routers.chatwoot_app.rule=Host(`chatwoot.localhost`)
-        - traefik.http.routers.chatwoot_app.entrypoints=web
-        - traefik.http.routers.chatwoot_app.priority=1
-        - traefik.http.routers.chatwoot_app.service=chatwoot_app
-        - traefik.http.services.chatwoot_app.loadbalancer.server.port=3000
-        - traefik.http.services.chatwoot_app.loadbalancer.passhostheader=true
+        - "traefik.enable=true"
+        - "traefik.docker.network=minha_rede"
+        - "traefik.http.routers.chatwoot_http.rule=Host(`chatwoot.localhost`)"
+        - "traefik.http.routers.chatwoot_http.entrypoints=web"
+        - "traefik.http.routers.chatwoot_http.priority=1"
+        - "traefik.http.routers.chatwoot_http.service=chatwoot_app"
+        - "traefik.http.routers.chatwoot_https.rule=Host(`chatwoot.localhost`)"
+        - "traefik.http.routers.chatwoot_https.entrypoints=websecure"
+        - "traefik.http.routers.chatwoot_https.priority=1"
+        - "traefik.http.routers.chatwoot_https.service=chatwoot_app"
+        - "traefik.http.routers.chatwoot_https.tls=true"
+        - "traefik.http.services.chatwoot_app.loadbalancer.server.port=3000"
+        - "traefik.http.services.chatwoot_app.loadbalancer.passhostheader=true"
 
   chatwoot_sidekiq:
     image: sendingtk/chatwoot:v3.9.5
@@ -88,7 +94,7 @@ services:
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
       - SECRET_KEY_BASE=123458bb7ef6402f6a8bcf5d3be54321
-      - FRONTEND_URL=http://chatwoot.localhost
+      - FRONTEND_URL=https://chatwoot.localhost
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
       - ENABLE_ACCOUNT_SIGNUP=false
