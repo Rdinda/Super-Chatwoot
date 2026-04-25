@@ -1,0 +1,245 @@
+
+
+services:
+
+## --------------------------- CHATWOOT APP --------------------------- ##
+
+  chatwoot_app:
+    image: chatwoot/chatwoot:v4.13.0
+    command: >
+      sh -c "echo 'Rails.application.config.active_storage.variant_processor = :mini_magick' > /app/config/initializers/active_storage.rb && bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"
+    entrypoint: docker/entrypoints/rails.sh    
+
+    volumes:
+      - chatwoot_storage:/app/storage
+      - chatwoot_public:/app/public
+      - chatwoot_mailer:/app/app/views/devise/mailer
+      - chatwoot_mailers:/app/app/views/mailers
+
+    networks:
+      - web
+      - app_net
+    
+    environment:
+      - INSTALLATION_NAME=novaimperiodooleo
+      - SECRET_KEY_BASE=0534a67282f7aa3cf3116810ec2e4b00
+
+      - FRONTEND_URL=https://chat.novaimperiodooleo.com
+      - FORCE_SSL=true
+
+      - DEFAULT_LOCALE=pt_BR
+      - TZ=America/Sao_Paulo
+
+      - REDIS_URL=redis://chatwoot_redis:6379
+
+      - POSTGRES_HOST=pgvector
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=56f297e330d27fba1057f2140c9e70b1
+      - POSTGRES_DATABASE=chatwoot
+
+      - ACTIVE_STORAGE_SERVICE=local
+
+      - MAILER_SENDER_EMAIL=Nova imperio <noreply@novaimperiodooleo.com.br>
+      - SMTP_DOMAIN=novaimperiodooleo.com.br
+      - SMTP_ADDRESS=mail.novaimperiodooleo.com.br
+      - SMTP_PORT=465
+      - SMTP_SSL=true
+      - SMTP_USERNAME=noreply@novaimperiodooleo.com.br
+      - SMTP_PASSWORD=@Nio134679
+      - SMTP_AUTHENTICATION=login
+      - SMTP_ENABLE_STARTTLS_AUTO=true
+      - SMTP_OPENSSL_VERIFY_MODE=peer
+      - MAILER_INBOUND_EMAIL_DOMAIN=noreply@novaimperiodooleo.com.br
+
+      ## 🔥 OTIMIZADO
+      - SIDEKIQ_CONCURRENCY=3
+      - RAILS_MAX_THREADS=5
+      - WEB_CONCURRENCY=2
+
+      - RACK_TIMEOUT_SERVICE_TIMEOUT=0
+      - ENABLE_RACK_ATTACK=false
+
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+      - RAILS_LOG_TO_STDOUT=true
+      - USE_INBOX_AVATAR_FOR_BOT=true
+      - ENABLE_ACCOUNT_SIGNUP=false
+
+      ## --- ENTERPRISE UNLOCK ---
+      - INSTALLATION_PRICING_PLAN=enterprise
+      - INSTALLATION_PRICING_PLAN_QUANTITY=10000
+      - DISABLE_TELEMETRY=true
+
+    configs:
+      - source: unlock_enterprise_init
+        target: /app/config/initializers/zz_unlock_enterprise.rb
+        mode: 0444
+      - source: unlock_enterprise_premium_features
+        target: /app/enterprise/config/premium_features.yml
+        mode: 0444
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --header='X-Forwarded-Proto: https' --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.40"
+          memory: 512M
+
+      labels:
+        - "io.portainer.stack.name=chatwoot"
+        - traefik.enable=true
+        - traefik.http.routers.chatwoot_app.rule=Host(`chat.novaimperiodooleo.com`)
+        - traefik.http.routers.chatwoot_app.entrypoints=websecure
+        - traefik.http.routers.chatwoot_app.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.chatwoot_app.service=chatwoot_app
+        - traefik.http.services.chatwoot_app.loadbalancer.server.port=3000
+        - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https
+        - traefik.http.routers.chatwoot_app.middlewares=sslheader
+
+## --------------------------- SIDEKIQ (WORKER) --------------------------- ##
+
+  chatwoot_sidekiq:
+    image: chatwoot/chatwoot:v4.13.0
+    command: bundle exec sidekiq -C config/sidekiq.yml
+
+    volumes:
+      - chatwoot_storage:/app/storage
+      - chatwoot_public:/app/public
+      - chatwoot_mailer:/app/app/views/devise/mailer
+      - chatwoot_mailers:/app/app/views/mailers
+
+    networks:
+      - app_net
+
+    environment:
+      - INSTALLATION_NAME=novaimperiodooleo
+      - SECRET_KEY_BASE=0534a67282f7aa3cf3116810ec2e4b00
+
+      - FRONTEND_URL=https://chat.novaimperiodooleo.com
+      - FORCE_SSL=true
+
+      - DEFAULT_LOCALE=pt_BR
+      - TZ=America/Sao_Paulo
+
+      - REDIS_URL=redis://chatwoot_redis:6379
+
+      - POSTGRES_HOST=pgvector
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=0534a67282f7aa3cf3116810ec2e4b00
+      - POSTGRES_DATABASE=chatwoot
+
+      - ACTIVE_STORAGE_SERVICE=local
+
+      ## 🔥 OTIMIZADO
+      - SIDEKIQ_CONCURRENCY=3
+
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+
+      ## --- ENTERPRISE UNLOCK ---
+      - INSTALLATION_PRICING_PLAN=enterprise
+      - INSTALLATION_PRICING_PLAN_QUANTITY=10000
+      - DISABLE_TELEMETRY=true
+
+    configs:
+      - source: unlock_enterprise_init
+        target: /app/config/initializers/zz_unlock_enterprise.rb
+        mode: 0444
+      - source: unlock_enterprise_premium_features
+        target: /app/enterprise/config/premium_features.yml
+        mode: 0444
+
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep '[s]idekiq' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager   # single-node swarm: sidekiq fica no manager
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: 384M
+
+## --------------------------- REDIS --------------------------- ##
+
+  chatwoot_redis:
+    image: redis:7-alpine
+    command: [
+      "redis-server",
+      "--appendonly",
+      "yes",
+      "--port",
+      "6379"
+    ]
+
+    volumes:
+      - chatwoot_redis:/data
+
+    networks:
+      - app_net
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+
+## --------------------------- VOLUMES --------------------------- ##
+
+volumes:
+  chatwoot_storage:
+    external: true
+  chatwoot_public:
+    external: true
+  chatwoot_mailer:
+    external: true
+  chatwoot_mailers:
+    external: true
+  chatwoot_redis:
+    external: true
+
+## --------------------------- NETWORK --------------------------- ##
+
+networks:
+  web:
+    external: true
+  app_net:
+    external: true
+
+## --------------------------- CONFIGS (Enterprise unlock) --------------------------- ##
+
+configs:
+  unlock_enterprise_init:
+    file: /opt/chatwoot-unlock-enterprise/config/initializers/zz_unlock_enterprise.rb
+  unlock_enterprise_premium_features:
+    file: /opt/chatwoot-unlock-enterprise/enterprise/config/premium_features.yml
