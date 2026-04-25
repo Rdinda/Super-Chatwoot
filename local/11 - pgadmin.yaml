@@ -1,0 +1,60 @@
+version: "3.7"
+
+##############
+#
+# pgAdmin 4 - Cliente web para administrar Postgres
+# Doc: https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
+#
+# Acesso local: http://localhost:5050
+#   email   : admin@admin.com
+#   senha   : @Nova63219248
+#
+# Conexões cadastradas via UI (host = nome do serviço Swarm na rede minha_rede):
+#   - postgres            (porta 5432, usuário postgres, senha AdminAdmin)
+#   - postgrespgvector    (porta 5432, usuário postgres, senha Mfcd62!!Mfcd62!!)
+#
+#############
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:9.14
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - minha_rede
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=@Nova63219248
+      - PGADMIN_LISTEN_PORT=80
+      - PGADMIN_DISABLE_POSTFIX=true
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="pgAdmin local - Super Chatwoot"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+volumes:
+  pgadmin_data:
+    external: true
+    name: pgadmin_data
+
+networks:
+  minha_rede:
+    external: true
+    name: minha_rede

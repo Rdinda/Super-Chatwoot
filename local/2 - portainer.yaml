@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   agent:
-    image: portainer/agent:2.20.1
+    image: portainer/agent:2.39.1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
@@ -18,8 +18,11 @@ services:
         constraints: [node.platform.os == linux]
 
   portainer:
-    image: portainer/portainer-ce:2.20.1
+    image: portainer/portainer-ce:2.39.1
     command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - "9000:9000"
+      - "9443:9443"
     volumes:
       - portainer_data:/data
     networks:
@@ -35,14 +38,6 @@ services:
         delay: 10s
       placement:
         constraints: [node.role == manager]
-      labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=minha_rede"
-        - "traefik.http.routers.portainer.rule=Host(`painel.localhost`)"
-        - "traefik.http.routers.portainer.entrypoints=web"
-        - "traefik.http.routers.portainer.priority=1"
-        - "traefik.http.routers.portainer.service=portainer"
-        - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
 networks:
   minha_rede:

@@ -1,0 +1,5 @@
+# Intentionally empty: list of features that ReconcilePlanConfigService would
+# disable when pricing_plan == 'community'. Kept empty as defense in depth so
+# that even if the monkey-patch in zz_unlock_enterprise.rb stops working, no
+# premium feature gets disabled by the periodic plan reconciliation job.
+[]

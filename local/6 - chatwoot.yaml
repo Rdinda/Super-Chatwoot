@@ -12,7 +12,7 @@ version: "3.7"
 
 services:
   chatwoot_app:
-    image: sendingtk/chatwoot:v3.9.5
+    image: astraonline/chatwoot:v4.13.0-interactive
     command: bundle exec rails s -p 3000 -b 0.0.0.0
     entrypoint: docker/entrypoints/rails.sh
     ports:
@@ -20,6 +20,14 @@ services:
     volumes:
       - chatwoot_data:/app/storage 
       - chatwoot_public:/app 
+    configs:
+      # Patches de desbloqueio do Enterprise injetados pelo Swarm
+      - source: unlock_enterprise_init
+        target: /app/config/initializers/zz_unlock_enterprise.rb
+        mode: 0444
+      - source: unlock_enterprise_premium_features
+        target: /app/enterprise/config/premium_features.yml
+        mode: 0444
     networks:
       - minha_rede
     environment:
@@ -31,7 +39,7 @@ services:
       - FRONTEND_URL=http://localhost:3000
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
-      - ENABLE_ACCOUNT_SIGNUP=false
+      - ENABLE_ACCOUNT_SIGNUP=true
       - REDIS_URL=redis://redis:6379
       - POSTGRES_HOST=postgrespgvector
       - POSTGRES_USERNAME=postgres
@@ -40,6 +48,10 @@ services:
       - ACTIVE_STORAGE_SERVICE=local
       - RAILS_LOG_TO_STDOUT=true
       - USE_INBOX_AVATAR_FOR_BOT=true
+      # Enterprise unlock (lidos pelo ChatwootApp/ChatwootHub e pelo initializer)
+      - INSTALLATION_PRICING_PLAN=enterprise
+      - INSTALLATION_PRICING_PLAN_QUANTITY=10000
+      - DISABLE_TELEMETRY=true
       # Servidor de Email Gmail
       - MAILER_SENDER_EMAIL=Chatwoot <noreply@localhost>
       - SMTP_DOMAIN=zoho.com
@@ -69,11 +81,19 @@ services:
           memory: 2048M
 
   chatwoot_sidekiq:
-    image: sendingtk/chatwoot:v3.9.5
+    image: astraonline/chatwoot:v4.13.0-interactive
     command: bundle exec sidekiq -C config/sidekiq.yml
     volumes:
       - chatwoot_data:/app/storage
       - chatwoot_public:/app
+    configs:
+      # Patches de desbloqueio do Enterprise injetados pelo Swarm
+      - source: unlock_enterprise_init
+        target: /app/config/initializers/zz_unlock_enterprise.rb
+        mode: 0444
+      - source: unlock_enterprise_premium_features
+        target: /app/enterprise/config/premium_features.yml
+        mode: 0444
     networks:
       - minha_rede
     environment:
@@ -85,7 +105,7 @@ services:
       - FRONTEND_URL=http://localhost:3000
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
-      - ENABLE_ACCOUNT_SIGNUP=false
+      - ENABLE_ACCOUNT_SIGNUP=true
       - REDIS_URL=redis://redis:6379
       - POSTGRES_HOST=postgrespgvector
       - POSTGRES_USERNAME=postgres
@@ -94,6 +114,10 @@ services:
       - ACTIVE_STORAGE_SERVICE=local
       - RAILS_LOG_TO_STDOUT=true
       - USE_INBOX_AVATAR_FOR_BOT=true
+      # Enterprise unlock (lidos pelo ChatwootApp/ChatwootHub e pelo initializer)
+      - INSTALLATION_PRICING_PLAN=enterprise
+      - INSTALLATION_PRICING_PLAN_QUANTITY=10000
+      - DISABLE_TELEMETRY=true
       # Servidor de Email Gmail
       - MAILER_SENDER_EMAIL=Chatwoot <noreply@localhost>
       - SMTP_DOMAIN=zoho.com
@@ -129,6 +153,12 @@ volumes:
   chatwoot_public:
     external: true
     name: chatwoot_public
+
+configs:
+  unlock_enterprise_init:
+    file: ./unlock-enterprise/config/initializers/zz_unlock_enterprise.rb
+  unlock_enterprise_premium_features:
+    file: ./unlock-enterprise/enterprise/config/premium_features.yml
 
 networks:
   minha_rede:

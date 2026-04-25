@@ -5,6 +5,7 @@ services:
     image: astraonline/postgrespgvector:2024
     environment:
       - POSTGRES_PASSWORD=Mfcd62!!Mfcd62!!
+      - POSTGRES_DB=chatwoot
     networks:
       - minha_rede
     ports:
