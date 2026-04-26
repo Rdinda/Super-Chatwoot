@@ -9,6 +9,9 @@
 # - Volume kanbancw-uploads. Banco kanbancw: init-kanbancw.sh no pgvector (volume novo) ou rodar o script no container existente.
 #
 # CHATWOOT_API_URL: ajuste se o Chatwoot não estiver em http://localhost:3000
+#
+# Front: defina VITE_API_URL (URL absoluta). Sem isso, a imagem pode gerar a string literal
+# "window.location.origin" em config.js e o browser chama /window.location.origin/api/...
 
 x-kanbancw-config: &kanbancw-config
   KANBANCW_DOMAIN: localhost
@@ -56,7 +59,9 @@ services:
       PORT: 3000
       LOG_LEVEL: info
       DATABASE_URL: ${KANBAN_DATABASE_URL:-postgresql://kanbancw:kanbancw_secret_2024@postgrespgvector_postgrespgvector:5432/kanbancw?schema=public}
-      REDIS_URL: redis://redis_redis:6379
+      REDIS_URL: redis://redis_redis:6379/0
+      REDIS_HOST: redis_redis
+      REDIS_PORT: "6379"
       UPLOAD_DIR: /app/uploads
       <<: *kanbancw-config
     volumes:
@@ -80,6 +85,9 @@ services:
 
   frontend:
     image: astraonline/kanbanfront:1.0.2
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - API_URL=http://localhost:8080
     networks:
       - minha_rede
     deploy:
