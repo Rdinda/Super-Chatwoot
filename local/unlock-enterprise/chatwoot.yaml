@@ -1,4 +1,5 @@
-
+## Stack Docker Swarm — use `docker stack deploy -c chatwoot.yaml <nome>` ou Portainer em modo Swarm.
+## O bloco `deploy` (abaixo) só é aplicado pelo orchestrator Swarm, não por `docker compose up` sem Swarm.
 
 services:
 
@@ -51,10 +52,10 @@ services:
       - SMTP_OPENSSL_VERIFY_MODE=peer
       - MAILER_INBOUND_EMAIL_DOMAIN=noreply@novaimperiodooleo.com.br
 
-      ## 🔥 OTIMIZADO
+      ## 🔥 OTIMIZADO (512M limitava → OOM; 1 worker + limite maior)
       - SIDEKIQ_CONCURRENCY=3
       - RAILS_MAX_THREADS=5
-      - WEB_CONCURRENCY=2
+      - WEB_CONCURRENCY=1
 
       - RACK_TIMEOUT_SERVICE_TIMEOUT=0
       - ENABLE_RACK_ATTACK=false
@@ -89,17 +90,33 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
       placement:
         constraints:
           - node.role == manager
       resources:
         limits:
-          cpus: "0.40"
+          cpus: "0.60"
+          memory: 1G
+        reservations:
+          cpus: "0.10"
           memory: 512M
-
       labels:
         - "io.portainer.stack.name=chatwoot"
         - traefik.enable=true
+        - traefik.docker.network=web
         - traefik.http.routers.chatwoot_app.rule=Host(`chat.novaimperiodooleo.com`)
         - traefik.http.routers.chatwoot_app.entrypoints=websecure
         - traefik.http.routers.chatwoot_app.tls.certresolver=letsencryptresolver
@@ -172,6 +189,19 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
       placement:
         constraints:
           - node.role == manager   # single-node swarm: sidekiq fica no manager
@@ -179,6 +209,9 @@ services:
         limits:
           cpus: "0.30"
           memory: 384M
+        reservations:
+          cpus: "0.05"
+          memory: 192M
 
 ## --------------------------- REDIS --------------------------- ##
 
@@ -206,6 +239,21 @@ services:
       start_period: 40s
 
     deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
       placement:
         constraints:
           - node.role == manager
@@ -213,6 +261,9 @@ services:
         limits:
           cpus: "0.20"
           memory: 128M
+        reservations:
+          cpus: "0.05"
+          memory: 64M
 
 ## --------------------------- VOLUMES --------------------------- ##
 
