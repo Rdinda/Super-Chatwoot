@@ -1,20 +1,18 @@
-# Kanban — Docker Swarm, localhost, sem Traefik.
-# Entrada única: http://localhost:8080 (Nginx encaminha /api, /socket.io, etc. ao backend).
+# KanbanCW — nova versão (abr/2026), alinhada ao stack atual em ../Kanban-chatwoot-free.yml
 #
-# Deploy (pasta local/):
-#   docker stack deploy -c Kanban-chatwoot-free.yml kanbancw
+# - Imagens: astraonline/kanbanback:1.0.2 + kanbanfront:1.0.2
+# - Postgres Kanban: mesmo cluster do Chatwoot (pgvector Swarm: postgrespgvector_postgrespgvector).
+#   Criar DB/usuário com init-kanbancw.sh (volume novo no pgvector ou exec manual no container).
+# - Redis: stack redis (redis_redis:6379) na overlay minha_rede.
+# - Entrada: gateway Nginx :8080 (UI + /api na mesma origem). Arquivo: ./kanbancw-gateway.conf
 #
-# Pré-requisitos:
-# - minha_rede + postgrespgvector + redis (stack redis → hostname redis_redis).
-# - Volume kanbancw-uploads. Banco kanbancw: init-kanbancw.sh no pgvector (volume novo) ou rodar o script no container existente.
+# Deploy (nesta pasta):
+#   docker stack deploy -c kanbanscript.yml kanbancw
 #
-# CHATWOOT_API_URL: ajuste se o Chatwoot não estiver em http://localhost:3000
+# Produção (HTTPS + domínio): troque os valores do anchor (localhost → URLs reais), ajuste
+# VITE_API_URL/API_URL para a URL pública do Kanban, e use Traefik ou outro proxy em vez do gateway se preferir.
 #
-# CHATWOOT_DATABASE_URL: Postgres do Chatwoot (leitura p/ JWT, Dashboard Script, etc.).
-# Alinhe usuário/senha com local/chatwoot.yaml; em senhas com ! use %21 na URL.
-#
-# Front: defina VITE_API_URL (URL absoluta). Sem isso, a imagem pode gerar a string literal
-# "window.location.origin" em config.js e o browser chama /window.location.origin/api/...
+# Opcional no backend (se a imagem suportar): CHATWOOT_PLATFORM_API_TOKEN, WAHA_*
 
 x-kanbancw-config: &kanbancw-config
   KANBANCW_DOMAIN: localhost
@@ -22,7 +20,6 @@ x-kanbancw-config: &kanbancw-config
   KANBANCW_URL: http://localhost:8080
   CHATWOOT_API_URL: http://localhost:3000
   CORS_ORIGIN: http://localhost:8080,http://localhost:3000
-
   EVOLUTION_API_URL: http://localhost:8081
   EVOLUTION_API_KEY: key_global_evolution
 

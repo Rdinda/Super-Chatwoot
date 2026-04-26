@@ -1,3 +1,14 @@
+[Atualização stack abr/2026] Imagens KanbanCW 1.0.2, gateway :8080, Postgres compartilhado (pgvector) + Redis Swarm.
+Arquivos: kanbanscript.yml, kanbancw-gateway.conf, init-kanbancw.sh (esta pasta). Deploy: docker stack deploy -c kanbanscript.yml kanbancw
+
+Acessando Dashboard Script
+
+https://seudominio.com.br/super_admin/app_config?config=internal
+
+
+
+----------------------------------------------------------
+
 <script>
 // ============================================================
 // SCRIPT 1: MENU KANBAN + CONEXÕES NO SIDEBAR
@@ -5,7 +16,7 @@
 (function() {
   'use strict';
 
-  const KANBAN_URL = 'http://localhost:8080';
+  const KANBAN_URL = 'https://kanban.seudominio.com.br';
 
   var panelOpen = false;
   var menuItemsAdded = false;
@@ -16,7 +27,7 @@
     if (document.getElementById('cw-custom-css')) return;
     var css = document.createElement('style');
     css.id = 'cw-custom-css';
-    css.textContent = '#cw-custom-menu-kanban,#cw-custom-menu-conexoes{margin-top:0 !important;margin-bottom:0 !important}#cw-custom-menu-kanban .menu-icon,#cw-custom-menu-conexoes .menu-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}#cw-custom-menu-kanban .menu-icon svg,#cw-custom-menu-conexoes .menu-icon svg{width:16px;height:16px}#cw-custom-panel{position:fixed;top:0;right:0;bottom:0;background:#fff;z-index:100;display:none;flex-direction:column}#cw-custom-panel.visible{display:flex}#cw-custom-panel .panel-body{flex:1;position:relative;background:#fff;overflow:hidden}#cw-custom-panel iframe{width:100%;height:100%;border:none;display:block}#cw-custom-panel .loading-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;z-index:10}#cw-custom-panel .loading-overlay.hidden{display:none}#cw-custom-panel .spinner{width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#1f93ff;border-radius:50%;animation:cwSpin .8s linear infinite}@keyframes cwSpin{to{transform:rotate(360deg)}}#cw-custom-panel .loading-text{margin-top:16px;color:#6e84a3;font-size:14px}#cw-custom-panel .error-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:#fff;text-align:center;padding:40px;z-index:10}#cw-custom-panel .error-overlay.visible{display:flex}#cw-custom-panel .error-icon{font-size:64px;margin-bottom:20px}#cw-custom-panel .error-title{font-size:20px;font-weight:600;color:#1f2d3d;margin:0 0 10px}#cw-custom-panel .error-text{color:#6e84a3;margin:0 0 24px;max-width:400px;line-height:1.5}#cw-custom-panel .error-btn{padding:12px 24px;background:#1f93ff;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}#cw-custom-panel .error-btn:hover{background:#1976d2}';
+    css.textContent = '#cw-custom-menu-kanban,#cw-custom-menu-conexoes,#cw-custom-menu-chats,#cw-custom-menu-projetos,#cw-custom-menu-permissoes,#cw-custom-menu-chatbot,#cw-custom-menu-permissions{margin-top:0 !important;margin-bottom:0 !important}#cw-custom-menu-kanban .menu-icon,#cw-custom-menu-conexoes .menu-icon,#cw-custom-menu-chats .menu-icon,#cw-custom-menu-projetos .menu-icon,#cw-custom-menu-permissoes .menu-icon,#cw-custom-menu-chatbot .menu-icon,#cw-custom-menu-permissions .menu-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}#cw-custom-menu-kanban .menu-icon svg,#cw-custom-menu-conexoes .menu-icon svg,#cw-custom-menu-chats .menu-icon svg,#cw-custom-menu-projetos .menu-icon svg,#cw-custom-menu-permissoes .menu-icon svg,#cw-custom-menu-chatbot .menu-icon svg,#cw-custom-menu-permissions .menu-icon svg{width:16px;height:16px}#cw-custom-panel{position:fixed;top:0;right:0;bottom:0;background:#fff;z-index:100;display:none;flex-direction:column}#cw-custom-panel.visible{display:flex}#cw-custom-panel .panel-body{flex:1;position:relative;background:#fff;overflow:hidden}#cw-custom-panel iframe{width:100%;height:100%;border:none;display:block}#cw-custom-panel .loading-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;z-index:10}#cw-custom-panel .loading-overlay.hidden{display:none}#cw-custom-panel .spinner{width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#1f93ff;border-radius:50%;animation:cwSpin .8s linear infinite}@keyframes cwSpin{to{transform:rotate(360deg)}}#cw-custom-panel .loading-text{margin-top:16px;color:#6e84a3;font-size:14px}#cw-custom-panel .error-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:#fff;text-align:center;padding:40px;z-index:10}#cw-custom-panel .error-overlay.visible{display:flex}#cw-custom-panel .error-icon{font-size:64px;margin-bottom:20px}#cw-custom-panel .error-title{font-size:20px;font-weight:600;color:#1f2d3d;margin:0 0 10px}#cw-custom-panel .error-text{color:#6e84a3;margin:0 0 24px;max-width:400px;line-height:1.5}#cw-custom-panel .error-btn{padding:12px 24px;background:#1f93ff;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}#cw-custom-panel .error-btn:hover{background:#1976d2}';
     document.head.appendChild(css);
   }
 
@@ -32,9 +43,18 @@
     if (document.getElementById('cw-custom-panel')) return;
     var panel = document.createElement('div');
     panel.id = 'cw-custom-panel';
-    panel.innerHTML = '<div class="panel-body"><div class="loading-overlay" id="cw-loading"><div class="spinner"></div><p class="loading-text">Carregando...</p></div><div class="error-overlay" id="cw-error"><div class="error-icon">🔒</div><h3 class="error-title">Site Protegido</h3><p class="error-text">Este site possui proteções que impedem a exibição incorporada.</p><button class="error-btn" onclick="window.cwCustomExternal()">↗️ Abrir em Nova Aba</button></div><iframe id="cw-iframe" src="about:blank"></iframe></div>';
+    panel.innerHTML = '<div class="panel-body"><div class="loading-overlay" id="cw-loading"><div class="spinner"></div><p class="loading-text">Carregando...</p></div><div class="error-overlay" id="cw-error"><div class="error-icon">🔒</div><h3 class="error-title">Site Protegido</h3><p class="error-text">Este site possui proteções que impedem a exibição incorporada.</p><button class="error-btn" onclick="window.cwCustomExternal()">↗️ Abrir em Nova Aba</button></div><iframe id="cw-iframe" src="about:blank" allow="microphone; camera"></iframe></div>';
     document.body.appendChild(panel);
   }
+
+  // Escuta mensagens do iframe para fechar o painel
+  window.addEventListener('message', function(event) {
+    // Verifica se a mensagem vem do KanbanCW
+    if (event.data && event.data.action === 'closePanel') {
+      console.log('[CW Menu] Recebeu mensagem para fechar painel');
+      window.cwCustomClose();
+    }
+  });
 
   function getAuthFromCookie() {
     var cookies = document.cookie.split(';');
@@ -64,6 +84,11 @@
     var error = document.getElementById('cw-error');
     var kanbanItem = document.getElementById('cw-custom-menu-kanban');
     var conexoesItem = document.getElementById('cw-custom-menu-conexoes');
+    var chatsItem = document.getElementById('cw-custom-menu-chats');
+    var projetosItem = document.getElementById('cw-custom-menu-projetos');
+    var permissoesItem = document.getElementById('cw-custom-menu-permissoes');
+    var chatbotItem = document.getElementById('cw-custom-menu-chatbot');
+    var permissionsItem = document.getElementById('cw-custom-menu-permissions');
 
     panel.style.left = getSidebarWidth() + 'px';
     loading.classList.remove('hidden');
@@ -71,12 +96,30 @@
     iframe.src = KANBAN_URL + path;
     panel.classList.add('visible');
 
+    // Remove 'active' de todos os itens primeiro
+    if (kanbanItem) kanbanItem.classList.remove('active');
+    if (conexoesItem) conexoesItem.classList.remove('active');
+    if (chatsItem) chatsItem.classList.remove('active');
+    if (projetosItem) projetosItem.classList.remove('active');
+    if (permissoesItem) permissoesItem.classList.remove('active');
+    if (chatbotItem) chatbotItem.classList.remove('active');
+    if (permissionsItem) permissionsItem.classList.remove('active');
+
+    // Adiciona 'active' apenas no item correto
     if (path === '/conexoes' && conexoesItem) {
       conexoesItem.classList.add('active');
-      if (kanbanItem) kanbanItem.classList.remove('active');
+    } else if (path === '/chats' && chatsItem) {
+      chatsItem.classList.add('active');
+    } else if (path === '/projects' && projetosItem) {
+      projetosItem.classList.add('active');
+    } else if (path === '/permissions' && permissoesItem) {
+      permissoesItem.classList.add('active');
+    } else if (path === '/chatbot' && chatbotItem) {
+      chatbotItem.classList.add('active');
+    } else if (path === '/admin/permissions' && permissionsItem) {
+      permissionsItem.classList.add('active');
     } else if (kanbanItem) {
       kanbanItem.classList.add('active');
-      if (conexoesItem) conexoesItem.classList.remove('active');
     }
 
     iframe.onload = function() {
@@ -100,16 +143,31 @@
     var iframe = document.getElementById('cw-iframe');
     var kanbanItem = document.getElementById('cw-custom-menu-kanban');
     var conexoesItem = document.getElementById('cw-custom-menu-conexoes');
+    var chatsItem = document.getElementById('cw-custom-menu-chats');
+    var projetosItem = document.getElementById('cw-custom-menu-projetos');
+    var permissoesItem = document.getElementById('cw-custom-menu-permissoes');
+    var chatbotItem = document.getElementById('cw-custom-menu-chatbot');
+    var permissionsItem = document.getElementById('cw-custom-menu-permissions');
 
     panel.classList.remove('visible');
     iframe.src = 'about:blank';
     if (kanbanItem) kanbanItem.classList.remove('active');
     if (conexoesItem) conexoesItem.classList.remove('active');
+    if (chatsItem) chatsItem.classList.remove('active');
+    if (projetosItem) projetosItem.classList.remove('active');
+    if (permissoesItem) permissoesItem.classList.remove('active');
+    if (chatbotItem) chatbotItem.classList.remove('active');
+    if (permissionsItem) permissionsItem.classList.remove('active');
   };
 
   window.cwCustomExternal = function() { window.open(KANBAN_URL, '_blank'); };
   window.cwCustomToggleKanban = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen(''); };
   window.cwCustomToggleConexoes = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/conexoes'); };
+  window.cwCustomToggleChats = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/chats'); };
+  window.cwCustomToggleProjetos = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/projects'); };
+  window.cwCustomTogglePermissoes = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/permissions'); };
+  window.cwCustomTogglePermissions = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/admin/permissions'); };
+  window.cwCustomToggleChatbot = function() { panelOpen ? window.cwCustomClose() : window.cwCustomOpen('/chatbot'); };
 
   function closeOnNavigation() {
     if (panelOpen && location.href !== lastUrl) {
@@ -133,8 +191,172 @@
     }, true);
   }
 
-  function addMenuItems() {
-    if (document.getElementById('cw-custom-menu-kanban')) { menuItemsAdded = true; return true; }
+  async function checkIfSuperAdmin() {
+    var authHeaders = getAuthFromCookie();
+    if (!authHeaders) {
+      console.log('[CW Menu] Sem authHeaders, não é SuperAdmin');
+      return false;
+    }
+
+    try {
+      // Usa URL relativa pois o script já está rodando no Chatwoot
+      var res = await fetch('/api/v1/profile', {
+        headers: {
+          'access-token': authHeaders['access-token'],
+          'token-type': authHeaders['token-type'] || 'Bearer',
+          'client': authHeaders['client'],
+          'expiry': authHeaders['expiry'] || '',
+          'uid': authHeaders['uid']
+        }
+      });
+
+      if (!res.ok) {
+        console.log('[CW Menu] Erro na resposta do profile:', res.status);
+        return false;
+      }
+      var data = await res.json();
+      console.log('[CW Menu] Profile type:', data.type);
+      return data.type === 'SuperAdmin';
+    } catch (err) {
+      console.log('[CW Menu] Erro ao verificar SuperAdmin:', err);
+      return false;
+    }
+  }
+
+  async function checkIfAccountAdmin() {
+    var authHeaders = getAuthFromCookie();
+    if (!authHeaders) {
+      return false;
+    }
+
+    try {
+      var res = await fetch('/api/v1/profile', {
+        headers: {
+          'access-token': authHeaders['access-token'],
+          'token-type': authHeaders['token-type'] || 'Bearer',
+          'client': authHeaders['client'],
+          'expiry': authHeaders['expiry'] || '',
+          'uid': authHeaders['uid']
+        }
+      });
+
+      if (!res.ok) {
+        return false;
+      }
+      var data = await res.json();
+      console.log('[CW Menu] User role:', data.role);
+      return data.role === 'administrator';
+    } catch (err) {
+      console.log('[CW Menu] Erro ao verificar role:', err);
+      return false;
+    }
+  }
+
+  async function checkEnabledFeatures() {
+    var authHeaders = getAuthFromCookie();
+    if (!authHeaders) {
+      console.log('[CW Menu] Sem authHeaders, retornando features desabilitadas');
+      return { kanbanEnabled: false, chatsInternosEnabled: false, conexoesEnabled: false };
+    }
+
+    try {
+      // Busca features habilitadas no backend KanbanCW
+      var res = await fetch(KANBAN_URL + '/api/features', {
+        headers: {
+          'access-token': authHeaders['access-token'],
+          'token-type': authHeaders['token-type'] || 'Bearer',
+          'client': authHeaders['client'],
+          'expiry': authHeaders['expiry'] || '',
+          'uid': authHeaders['uid']
+        }
+      });
+
+      if (!res.ok) {
+        console.log('[CW Menu] Erro ao buscar features:', res.status);
+        // Em caso de erro, habilita tudo (fail-open)
+        return { kanbanEnabled: true, chatsInternosEnabled: true, conexoesEnabled: true };
+      }
+
+      var result = await res.json();
+      var features = result.data || {};
+      console.log('[CW Menu] Features habilitadas:', features);
+      return {
+        kanbanEnabled: features.kanbanEnabled !== false,
+        chatsInternosEnabled: features.chatsInternosEnabled !== false,
+        conexoesEnabled: features.conexoesEnabled !== false
+      };
+    } catch (err) {
+      console.log('[CW Menu] Erro ao verificar features:', err);
+      // Em caso de erro, habilita tudo (fail-open)
+      return { kanbanEnabled: true, chatsInternosEnabled: true, conexoesEnabled: true };
+    }
+  }
+
+  async function checkUserPermissions() {
+    try {
+      var authHeaders = getAuthFromCookie();
+      if (!authHeaders || !authHeaders['access-token']) {
+        console.log('[CW Menu] Sem headers de auth, usando permissões padrão');
+        return {
+          kanbanAccess: true,
+          conexoesAccess: true,
+          chatsInternosAccess: true,
+          projectsAccess: true,
+          chatbotFlowsAccess: true,
+          permissoesAccess: false
+        };
+      }
+
+      var res = await fetch(KANBAN_URL + '/api/permissions/me', {
+        headers: {
+          'access-token': authHeaders['access-token'],
+          'token-type': authHeaders['token-type'] || 'Bearer',
+          'client': authHeaders['client'],
+          'expiry': authHeaders['expiry'] || '',
+          'uid': authHeaders['uid']
+        }
+      });
+
+      if (!res.ok) {
+        console.log('[CW Menu] Erro ao buscar permissões do usuário:', res.status);
+        // Em caso de erro, habilita tudo (fail-open)
+        return {
+          kanbanAccess: true,
+          conexoesAccess: true,
+          chatsInternosAccess: true,
+          projectsAccess: true,
+          chatbotFlowsAccess: true,
+          permissoesAccess: false
+        };
+      }
+
+      var result = await res.json();
+      var permissions = result.data || {};
+      console.log('[CW Menu] Permissões do usuário:', permissions);
+      return {
+        kanbanAccess: permissions.kanbanAccess !== false,
+        conexoesAccess: permissions.conexoesAccess !== false,
+        chatsInternosAccess: permissions.chatsInternosAccess !== false,
+        projectsAccess: permissions.projectsAccess !== false,
+        chatbotFlowsAccess: permissions.chatbotFlowsAccess !== false,
+        permissoesAccess: permissions.permissoesAccess === true
+      };
+    } catch (err) {
+      console.log('[CW Menu] Erro ao verificar permissões:', err);
+      // Em caso de erro, habilita tudo (fail-open)
+      return {
+        kanbanAccess: true,
+        conexoesAccess: true,
+        chatsInternosAccess: true,
+        projectsAccess: true,
+        chatbotFlowsAccess: true,
+        permissoesAccess: false
+      };
+    }
+  }
+
+  async function addMenuItems() {
+    if (menuItemsAdded) return true;
 
     var mainNav = document.querySelector('aside nav ul.list-none, aside nav > ul, nav.grid ul');
     if (!mainNav) {
@@ -150,8 +372,12 @@
 
     var refLi = null;
     var refLink = null;
+    var configLi = null;
     for (var i = 0; i < allLi.length; i++) {
       var text = allLi[i].textContent.toLowerCase();
+      if (text.includes('configurações') || text.includes('settings')) {
+        configLi = allLi[i];
+      }
       if (text.includes('relatório') || text.includes('report') || text.includes('campanha') || text.includes('campaign')) {
         refLi = allLi[i];
         refLink = refLi.querySelector('a, div[role="button"]');
@@ -169,36 +395,193 @@
       return false;
     }
 
-    // Menu Kanban
-    var kanbanLi = document.createElement('li');
-    kanbanLi.className = refLi.className;
-    var kanbanItem = document.createElement('div');
-    kanbanItem.id = 'cw-custom-menu-kanban';
-    kanbanItem.className = refLink.className;
-    kanbanItem.setAttribute('role', 'button');
-    kanbanItem.style.cursor = 'pointer';
-    kanbanItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg></span><span class="text-sm font-medium leading-5 truncate">Kanban</span></div></div>';
-    kanbanItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleKanban(); };
-    kanbanLi.appendChild(kanbanItem);
+    // Verifica quais features estão habilitadas (nível de conta)
+    var features = await checkEnabledFeatures();
+    console.log('[CW Menu] Features da conta:', features);
 
-    // Menu Conexões
-    var conexoesLi = document.createElement('li');
-    conexoesLi.className = refLi.className;
-    var conexoesItem = document.createElement('div');
-    conexoesItem.id = 'cw-custom-menu-conexoes';
-    conexoesItem.className = refLink.className;
-    conexoesItem.setAttribute('role', 'button');
-    conexoesItem.style.cursor = 'pointer';
-    conexoesItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="text-sm font-medium leading-5 truncate">Conexões</span></div></div>';
-    conexoesItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleConexoes(); };
-    conexoesLi.appendChild(conexoesItem);
+    // Verifica permissões do usuário (nível de usuário)
+    var permissions = await checkUserPermissions();
+    console.log('[CW Menu] Permissões do usuário:', permissions);
 
-    mainNav.insertBefore(kanbanLi, refLi);
-    mainNav.insertBefore(conexoesLi, refLi);
+    // Menu Kanban (se feature habilitada E usuário tem permissão)
+    if (features.kanbanEnabled && permissions.kanbanAccess) {
+      var kanbanLi = document.createElement('li');
+      kanbanLi.className = refLi.className;
+      var kanbanItem = document.createElement('div');
+      kanbanItem.id = 'cw-custom-menu-kanban';
+      kanbanItem.className = refLink.className;
+      kanbanItem.setAttribute('role', 'button');
+      kanbanItem.style.cursor = 'pointer';
+      kanbanItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg></span><span class="text-sm font-medium leading-5 truncate">Kanban</span></div></div>';
+      kanbanItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleKanban(); };
+      kanbanLi.appendChild(kanbanItem);
+      mainNav.insertBefore(kanbanLi, refLi);
+      console.log('[CW Menu] Menu Kanban adicionado');
+    } else {
+      console.log('[CW Menu] Menu Kanban NÃO adicionado (desabilitado)');
+    }
+
+    // Menu Conexões (se feature habilitada E usuário tem permissão)
+    if (features.conexoesEnabled && permissions.conexoesAccess) {
+      var conexoesLi = document.createElement('li');
+      conexoesLi.className = refLi.className;
+      var conexoesItem = document.createElement('div');
+      conexoesItem.id = 'cw-custom-menu-conexoes';
+      conexoesItem.className = refLink.className;
+      conexoesItem.setAttribute('role', 'button');
+      conexoesItem.style.cursor = 'pointer';
+      conexoesItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="text-sm font-medium leading-5 truncate">Conexões</span></div></div>';
+      conexoesItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleConexoes(); };
+      conexoesLi.appendChild(conexoesItem);
+      mainNav.insertBefore(conexoesLi, refLi);
+      console.log('[CW Menu] Menu Conexões adicionado');
+    } else {
+      console.log('[CW Menu] Menu Conexões NÃO adicionado (desabilitado)');
+    }
+
+    // Menu Chats Internos (se feature habilitada E usuário tem permissão)
+    if (features.chatsInternosEnabled && permissions.chatsInternosAccess) {
+      var chatsLi = document.createElement('li');
+      chatsLi.className = refLi.className;
+      var chatsItem = document.createElement('div');
+      chatsItem.id = 'cw-custom-menu-chats';
+      chatsItem.className = refLink.className;
+      chatsItem.setAttribute('role', 'button');
+      chatsItem.style.cursor = 'pointer';
+      chatsItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></span><span class="text-sm font-medium leading-5 truncate">Chats Internos</span></div></div>';
+      chatsItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleChats(); };
+      chatsLi.appendChild(chatsItem);
+      mainNav.insertBefore(chatsLi, refLi);
+      console.log('[CW Menu] Menu Chats Internos adicionado');
+    } else {
+      console.log('[CW Menu] Menu Chats Internos NÃO adicionado (desabilitado)');
+    }
+
+    // Menu Projetos (se usuário tem permissão)
+    if (permissions.projectsAccess) {
+      var projetosLi = document.createElement('li');
+    projetosLi.className = refLi.className;
+    var projetosItem = document.createElement('div');
+    projetosItem.id = 'cw-custom-menu-projetos';
+    projetosItem.className = refLink.className;
+    projetosItem.setAttribute('role', 'button');
+    projetosItem.style.cursor = 'pointer';
+    projetosItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></span><span class="text-sm font-medium leading-5 truncate">Projetos</span></div></div>';
+    projetosItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleProjetos(); };
+      projetosLi.appendChild(projetosItem);
+      mainNav.insertBefore(projetosLi, refLi);
+      console.log('[CW Menu] Menu Projetos adicionado');
+    }
+
+    // Botão Permissões Extras na página de Funções Personalizadas
+    var isAccountAdmin = await checkIfAccountAdmin();
+    if (isAccountAdmin || permissions.permissoesAccess) {
+      console.log('[CW Menu] Configurando botão Permissões Extras na página de Funções Personalizadas');
+
+      // Função para adicionar botão na página
+      function addPermissoesButton() {
+        // Verifica se já adicionou
+        if (document.getElementById('cw-custom-permissoes-button')) {
+          return;
+        }
+
+        // Procura o botão "Adicionar função personalizada" ou "Add custom role"
+        var buttons = document.querySelectorAll('button');
+        var addRoleButton = null;
+
+        for (var i = 0; i < buttons.length; i++) {
+          var text = buttons[i].textContent.toLowerCase();
+          if (text.includes('adicionar função personalizada') || text.includes('add custom role')) {
+            addRoleButton = buttons[i];
+            break;
+          }
+        }
+
+        if (addRoleButton && addRoleButton.parentElement) {
+          console.log('[CW Menu] Botão de adicionar função encontrado, criando botão Permissões Extras');
+
+          // Cria o botão de Permissões Extras
+          var permissoesButton = document.createElement('button');
+          permissoesButton.id = 'cw-custom-permissoes-button';
+          permissoesButton.className = addRoleButton.className;
+          permissoesButton.type = 'button';
+          permissoesButton.style.marginLeft = '8px';
+
+          // Ícone de escudo/permissões + texto
+          permissoesButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.657-11.657l-4.243 4.243m0 6l-4.243 4.243M1 12h6m6 0h6m-1.343-5.657l-4.243 4.243m0 6l-4.243 4.243"></path></svg><span>Permissões Extras</span>';
+
+          permissoesButton.onclick = function(e) {
+            e.preventDefault();
+            window.cwCustomTogglePermissoes();
+          };
+
+          // Insere o botão ao lado do botão existente
+          addRoleButton.parentElement.appendChild(permissoesButton);
+          console.log('[CW Menu] Botão Permissões Extras adicionado');
+        }
+      }
+
+      // Observer para detectar quando a página de Funções Personalizadas é carregada
+      var pageObserver = new MutationObserver(function() {
+        // Verifica se está na página de custom roles
+        var path = window.location.pathname;
+        if (path.includes('custom_role') || path.includes('custom-role')) {
+          addPermissoesButton();
+        }
+      });
+
+      // Observa mudanças no body
+      pageObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      // Tenta adicionar imediatamente se já estiver na página
+      setTimeout(addPermissoesButton, 1000);
+    }
+
+    // Menu Chatbot Flows (se usuário tem permissão)
+    if (permissions.chatbotFlowsAccess) {
+      var chatbotLi = document.createElement('li');
+      chatbotLi.className = refLi.className;
+      var chatbotItem = document.createElement('div');
+      chatbotItem.id = 'cw-custom-menu-chatbot';
+      chatbotItem.className = refLink.className;
+      chatbotItem.setAttribute('role', 'button');
+      chatbotItem.style.cursor = 'pointer';
+      chatbotItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 640 512" fill="currentColor"><path d="M128 32C92.7 32 64 60.7 64 96v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H128zM512 96c0 53-43 96-96 96H346.5l-45.3 128H384c53 0 96 43 96 96s-43 96-96 96H256c-53 0-96-43-96-96s43-96 96-96h82.5l45.3-128H256c-53 0-96-43-96-96V96c0-53 43-96 96-96H384c53 0 96 43 96 96V96zM384 352H256c-26.5 0-48 21.5-48 48s21.5 48 48 48H384c26.5 0 48-21.5 48-48s-21.5-48-48-48z"/></svg></span><span class="text-sm font-medium leading-5 truncate">Chatbot Flows</span></div></div>';
+      chatbotItem.onclick = function(e) { e.preventDefault(); window.cwCustomToggleChatbot(); };
+      chatbotLi.appendChild(chatbotItem);
+      mainNav.insertBefore(chatbotLi, refLi);
+      console.log('[CW Menu] Menu Chatbot Flows adicionado');
+    }
+
+    // Menu Config Extra (apenas para SuperAdmin)
+    var isSuperAdmin = await checkIfSuperAdmin();
+    if (isSuperAdmin && configLi) {
+      console.log('[CW Menu] Usuário é SuperAdmin, adicionando menu Config Extra');
+      var permissionsLi = document.createElement('li');
+      permissionsLi.className = refLi.className;
+      var permissionsItem = document.createElement('div');
+      permissionsItem.id = 'cw-custom-menu-permissions';
+      permissionsItem.className = refLink.className;
+      permissionsItem.setAttribute('role', 'button');
+      permissionsItem.style.cursor = 'pointer';
+      permissionsItem.innerHTML = '<div class="relative flex items-center gap-2"><div class="flex items-center gap-1.5 flex-grow min-w-0"><span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span><span class="text-sm font-medium leading-5 truncate">Config Extra</span></div></div>';
+      permissionsItem.onclick = function(e) { e.preventDefault(); window.cwCustomTogglePermissions(); };
+      permissionsLi.appendChild(permissionsItem);
+
+      // Insere após o item de Configurações
+      if (configLi.nextSibling) {
+        mainNav.insertBefore(permissionsLi, configLi.nextSibling);
+      } else {
+        mainNav.appendChild(permissionsLi);
+      }
+    }
 
     menuItemsAdded = true;
     if (observer) { observer.disconnect(); observer = null; }
-    console.log('[CW Menu] Itens Kanban e Conexões adicionados!');
+    console.log('[CW Menu] Adição de menus concluída!');
     return true;
   }
 
@@ -231,7 +614,7 @@
   'use strict';
 
   // ⚠️ MESMA URL DO SCRIPT 1 - Substituída automaticamente
-  const KANBAN_URL = 'http://localhost:8080';
+  const KANBAN_URL = 'https://kanban.seudominio.com.br';
 
   var WIDGET_CONFIG = {
     apiUrl: KANBAN_URL + '/api'
@@ -945,3 +1328,7 @@
   }
 })();
 </script>
+
+
+
+----------------------------------------------------------

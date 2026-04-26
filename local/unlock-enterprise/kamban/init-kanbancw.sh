@@ -1,6 +1,6 @@
 #!/bin/sh
 # Cria usuário e banco do Kanban (idempotente).
-# 1ª inicialização: volume vazio + /docker-entrypoint-initdb.d
+# 1ª inicialização: volume vazio + /docker-entrypoint-initdb.d no postgrespgvector
 # Cluster já existente: docker exec -i <container_pgvector> sh -s < init-kanbancw.sh
 # Use finais de linha LF (Unix); CRLF quebra "set -eu" no Linux.
 set -eu
