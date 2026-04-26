@@ -1,0 +1,2 @@
+# Scripts montados em containers Linux precisam de LF (CRLF quebra set -eu no sh).
+init-kanbancw.sh text eol=lf

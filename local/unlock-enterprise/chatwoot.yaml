@@ -1,5 +1,6 @@
 ## Stack Docker Swarm — use `docker stack deploy -c chatwoot.yaml <nome>` ou Portainer em modo Swarm.
 ## O bloco `deploy` (abaixo) só é aplicado pelo orchestrator Swarm, não por `docker compose up` sem Swarm.
+## Não monte volume em /app/public: a imagem traz os assets Vite; volume vazio quebra superadmin/onboarding.
 
 services:
 
@@ -13,7 +14,6 @@ services:
 
     volumes:
       - chatwoot_storage:/app/storage
-      - chatwoot_public:/app/public
       - chatwoot_mailer:/app/app/views/devise/mailer
       - chatwoot_mailers:/app/app/views/mailers
 
@@ -133,7 +133,6 @@ services:
 
     volumes:
       - chatwoot_storage:/app/storage
-      - chatwoot_public:/app/public
       - chatwoot_mailer:/app/app/views/devise/mailer
       - chatwoot_mailers:/app/app/views/mailers
 
@@ -269,8 +268,6 @@ services:
 
 volumes:
   chatwoot_storage:
-    external: true
-  chatwoot_public:
     external: true
   chatwoot_mailer:
     external: true

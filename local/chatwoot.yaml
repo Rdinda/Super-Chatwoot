@@ -2,24 +2,27 @@ version: "3.7"
 
 ##############
 #
-# Execute o mando para migrar o banco:
+# Swarm: POSTGRES_HOST / REDIS_URL usam <stack>_<serviço>. Ajuste se seus
+# stacks não forem deployados como: postgrespgvector + postgrespgvector, redis + redis.
 #
-# bundle exec rails db:chatwoot_prepare
+# Banco: stack postgrespgvector (pgvector). O stack postgres fica para n8n/outros.
 #
-# Banco: stack "9 - postgrespgvector" (pgvector). O stack "3 - postgres" fica para n8n/outros.
+# Não monte volume em /app/public: a imagem já traz os bundles Vite (superadmin, etc.);
+# um volume vazio substitui o manifest e gera erro "can't find entrypoints/superadmin.js".
 #
 #############
 
 services:
   chatwoot_app:
     image: chatwoot/chatwoot:v4.13.0
-    command: bundle exec rails s -p 3000 -b 0.0.0.0
+    # Prepara o banco antes do boot (sem isso o Rails quebra ao ler installation_configs).
+    command: >
+      sh -c "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"
     entrypoint: docker/entrypoints/rails.sh
     ports:
       - "3000:3000"
     volumes:
-      - chatwoot_data:/app/storage 
-      - chatwoot_public:/app 
+      - chatwoot_data:/app/storage
     configs:
       # Patches de desbloqueio do Enterprise injetados pelo Swarm
       - source: unlock_enterprise_init
@@ -40,8 +43,9 @@ services:
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
       - ENABLE_ACCOUNT_SIGNUP=true
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_HOST=postgrespgvector
+      # Swarm: host = <nome_do_stack>_<nome_do_serviço> na mesma overlay (ex.: stack redis + serviço redis).
+      - REDIS_URL=redis://redis_redis:6379
+      - POSTGRES_HOST=postgrespgvector_postgrespgvector
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=Mfcd62!!Mfcd62!!
       - POSTGRES_DATABASE=chatwoot
@@ -85,7 +89,6 @@ services:
     command: bundle exec sidekiq -C config/sidekiq.yml
     volumes:
       - chatwoot_data:/app/storage
-      - chatwoot_public:/app
     configs:
       # Patches de desbloqueio do Enterprise injetados pelo Swarm
       - source: unlock_enterprise_init
@@ -106,8 +109,9 @@ services:
       - DEFAULT_LOCALE=pt_BR
       - FORCE_SSL=false
       - ENABLE_ACCOUNT_SIGNUP=true
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_HOST=postgrespgvector
+      # Swarm: host = <nome_do_stack>_<nome_do_serviço> na mesma overlay (ex.: stack redis + serviço redis).
+      - REDIS_URL=redis://redis_redis:6379
+      - POSTGRES_HOST=postgrespgvector_postgrespgvector
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=Mfcd62!!Mfcd62!!
       - POSTGRES_DATABASE=chatwoot
@@ -150,9 +154,6 @@ volumes:
   chatwoot_data:
     external: true
     name: chatwoot_data
-  chatwoot_public:
-    external: true
-    name: chatwoot_public
 
 configs:
   unlock_enterprise_init:

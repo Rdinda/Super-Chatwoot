@@ -1,0 +1,108 @@
+# Kanban — Docker Swarm, localhost, sem Traefik.
+# Entrada única: http://localhost:8080 (Nginx encaminha /api, /socket.io, etc. ao backend).
+#
+# Deploy (pasta local/):
+#   docker stack deploy -c Kanban-chatwoot-free.yml kanbancw
+#
+# Pré-requisitos:
+# - minha_rede + postgrespgvector + redis (stack redis → hostname redis_redis).
+# - Volume kanbancw-uploads. Banco kanbancw: init-kanbancw.sh no pgvector (volume novo) ou rodar o script no container existente.
+#
+# CHATWOOT_API_URL: ajuste se o Chatwoot não estiver em http://localhost:3000
+
+x-kanbancw-config: &kanbancw-config
+  KANBANCW_DOMAIN: localhost
+  CHATWOOT_DOMAIN: localhost
+  KANBANCW_URL: http://localhost:8080
+  CHATWOOT_API_URL: http://localhost:3000
+  CORS_ORIGIN: http://localhost:8080,http://localhost:3000
+
+  EVOLUTION_API_URL: http://localhost:8081
+  EVOLUTION_API_KEY: key_global_evolution
+
+configs:
+  kanbancw_gateway_conf:
+    file: ./kanbancw-gateway.conf
+
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    networks:
+      - minha_rede
+    configs:
+      - source: kanbancw_gateway_conf
+        target: /etc/nginx/conf.d/default.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == manager
+
+  backend:
+    image: astraonline/kanbanback:1.0.2
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: info
+      DATABASE_URL: ${KANBAN_DATABASE_URL:-postgresql://kanbancw:kanbancw_secret_2024@postgrespgvector_postgrespgvector:5432/kanbancw?schema=public}
+      REDIS_URL: redis://redis_redis:6379
+      UPLOAD_DIR: /app/uploads
+      <<: *kanbancw-config
+    volumes:
+      - kanbancw-uploads:/app/uploads
+    networks:
+      - minha_rede
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == manager
+
+  frontend:
+    image: astraonline/kanbanfront:1.0.2
+    networks:
+      - minha_rede
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  kanbancw-uploads:
+    external: true
+    name: kanbancw-uploads
+
+networks:
+  minha_rede:
+    external: true
+    name: minha_rede

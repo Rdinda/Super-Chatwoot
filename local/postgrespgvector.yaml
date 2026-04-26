@@ -1,5 +1,10 @@
 version: "3.7"
 
+# init-kanbancw.sh: cria usuário/DB Kanban (idempotente) na 1ª inicialização (volume novo).
+# Volume já com dados: docker exec -i <container_pgvector> sh -s < init-kanbancw.sh
+# Deploy Swarm: rode stack deploy a partir da pasta local/ para o bind mount ./init-kanbancw.sh resolver.
+# Em Windows, mantenha init-kanbancw.sh com finais de linha LF (ver local/.gitattributes); CRLF quebra o sh no Linux.
+
 services:
   postgrespgvector:
     image: astraonline/postgrespgvector:2024
@@ -12,6 +17,7 @@ services:
       - 5436:5432
     volumes:
       - postgrespgvector:/var/lib/postgresql/data
+      - ./init-kanbancw.sh:/docker-entrypoint-initdb.d/99-kanbancw.sh:ro
     deploy:
       mode: replicated
       replicas: 1

@@ -41,7 +41,7 @@ audit_logs, disable_branding, saml
 
 ```
 local/
-├── 6 - chatwoot.yaml                    ← já editado (configs + 3 vars)
+├── chatwoot.yaml                        ← já editado (configs + 3 vars)
 └── unlock-enterprise/
     ├── README.md                        ← este arquivo
     ├── config/initializers/
@@ -63,7 +63,7 @@ A solução canônica do Swarm é o objeto **`configs:`**, que distribui arquivo
 pequenos para os nós e os monta dentro do container. Funciona perfeitamente
 mesmo em deploys multi-nó e sobrevive a updates.
 
-### O que mudou no `6 - chatwoot.yaml`
+### O que mudou no `chatwoot.yaml`
 
 **No nível raiz** (depois do bloco `volumes:`):
 
@@ -124,7 +124,7 @@ Start-Sleep -Seconds 30
 
 ```powershell
 cd "G:\Outros computadores\Meu laptop\Documents\GitHub\Super Chatwoot\local"
-docker stack deploy -c "6 - chatwoot.yaml" chatwoot
+docker stack deploy -c "chatwoot.yaml" chatwoot
 ```
 
 ### Passo 4 — Confirmar que os configs foram criados
@@ -226,7 +226,7 @@ docker config ls | findstr unlock
 ```
 
 - **Está vazio** → o YAML não foi parseado corretamente. Verifica que o
-  bloco `configs:` na raiz do `6 - chatwoot.yaml` existe (linha ~157).
+  bloco `configs:` na raiz do `chatwoot.yaml` existe (linha ~157).
 - **Aparecem com nome diferente do prefixo `chatwoot_`** → o stack subiu
   com outro nome. Renomeie ao deployar (`docker stack deploy ... chatwoot`).
 
@@ -256,7 +256,7 @@ o Swarm reclama. Solução:
 docker stack rm chatwoot
 Start-Sleep -Seconds 30
 docker config ls | findstr unlock | ForEach-Object { docker config rm ($_ -split '\s+')[0] }
-docker stack deploy -c "6 - chatwoot.yaml" chatwoot
+docker stack deploy -c "chatwoot.yaml" chatwoot
 ```
 
 ### F. `bind mount` ignorado (caso histórico, não acontece mais)
@@ -278,7 +278,7 @@ e ficam embutidos pelo Swarm. Confirmação real é via `docker exec ls`.
 
 ## 7. Como reverter (voltar ao Community)
 
-1. Edite `6 - chatwoot.yaml` e remova:
+1. Edite `chatwoot.yaml` e remova:
    - O bloco `configs:` em **cada serviço** (chatwoot_app e chatwoot_sidekiq)
    - O bloco `configs:` na raiz (depois de `volumes:`)
    - As 3 variáveis de ambiente do bloco "Enterprise unlock"
@@ -288,7 +288,7 @@ e ficam embutidos pelo Swarm. Confirmação real é via `docker exec ls`.
 ```powershell
 docker stack rm chatwoot
 Start-Sleep -Seconds 30
-docker stack deploy -c "6 - chatwoot.yaml" chatwoot
+docker stack deploy -c "chatwoot.yaml" chatwoot
 ```
 
 > Os flags `feature_*` ficam gravados no banco mesmo após reverter. Pra
