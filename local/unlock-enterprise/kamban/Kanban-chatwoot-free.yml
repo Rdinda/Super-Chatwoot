@@ -10,6 +10,9 @@
 #
 # CHATWOOT_API_URL: ajuste se o Chatwoot não estiver em http://localhost:3000
 #
+# CHATWOOT_DATABASE_URL: Postgres do Chatwoot (leitura p/ JWT, Dashboard Script, etc.).
+# Alinhe usuário/senha com local/chatwoot.yaml; em senhas com ! use %21 na URL.
+#
 # Front: defina VITE_API_URL (URL absoluta). Sem isso, a imagem pode gerar a string literal
 # "window.location.origin" em config.js e o browser chama /window.location.origin/api/...
 
@@ -59,6 +62,7 @@ services:
       PORT: 3000
       LOG_LEVEL: info
       DATABASE_URL: ${KANBAN_DATABASE_URL:-postgresql://kanbancw:kanbancw_secret_2024@postgrespgvector_postgrespgvector:5432/kanbancw?schema=public}
+      CHATWOOT_DATABASE_URL: ${CHATWOOT_DATABASE_URL:-postgresql://postgres:Mfcd62%21%21Mfcd62%21%21@postgrespgvector_postgrespgvector:5432/chatwoot?schema=public}
       REDIS_URL: redis://redis_redis:6379/0
       REDIS_HOST: redis_redis
       REDIS_PORT: "6379"
