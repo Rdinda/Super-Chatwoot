@@ -1,9 +1,10 @@
 [Atualização stack abr/2026] Imagens KanbanCW 1.0.2, gateway :8080, Postgres compartilhado (pgvector) + Redis Swarm.
-Arquivos: kanbanscript.yml, kanbancw-gateway.conf, init-kanbancw.sh (esta pasta). Deploy: docker stack deploy -c kanbanscript.yml kanbancw
+Arquivos: Kanban-chatwoot-free.yml, kanbancw-gateway.conf, init-kanbancw.sh. Deploy: docker stack deploy -c Kanban-chatwoot-free.yml <nome_do_stack>
+URLs neste tutorial (dev local): Chatwoot :3000, Kanban (gateway) :8080. Em produção, troque por HTTPS + seus domínios.
 
 Acessando Dashboard Script
 
-https://seudominio.com.br/super_admin/app_config?config=internal
+http://localhost:3000/super_admin/app_config?config=internal
 
 
 
@@ -16,7 +17,7 @@ https://seudominio.com.br/super_admin/app_config?config=internal
 (function() {
   'use strict';
 
-  const KANBAN_URL = 'https://kanban.seudominio.com.br';
+  const KANBAN_URL = 'http://localhost:8080';
 
   var panelOpen = false;
   var menuItemsAdded = false;
@@ -613,8 +614,8 @@ https://seudominio.com.br/super_admin/app_config?config=internal
 (function() {
   'use strict';
 
-  // ⚠️ MESMA URL DO SCRIPT 1 - Substituída automaticamente
-  const KANBAN_URL = 'https://kanban.seudominio.com.br';
+  // ⚠️ MESMA URL DO SCRIPT 1 — mantenha igual em ambos os scripts (dev: http://localhost:8080)
+  const KANBAN_URL = 'http://localhost:8080';
 
   var WIDGET_CONFIG = {
     apiUrl: KANBAN_URL + '/api'
