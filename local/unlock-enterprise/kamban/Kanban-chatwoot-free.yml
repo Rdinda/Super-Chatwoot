@@ -7,7 +7,10 @@
 # - Entrada: gateway Nginx :8080 (UI + /api na mesma origem). Arquivo: ./kanbancw-gateway.conf
 #
 # Deploy (nesta pasta):
-#   docker stack deploy -c kanbanscript.yml kanbancw
+#   docker stack deploy -c Kanban-chatwoot-free.yml <nome_do_stack>
+#
+# Swarm: Docker Config é imutável. Se mudar kanbancw-gateway.conf e o deploy falhar com
+# "only updates to Labels are allowed", altere o nome em configs: (ex. kanbancw_gateway_conf_v3).
 #
 # Produção (HTTPS + domínio): troque os valores do anchor (localhost → URLs reais), ajuste
 # VITE_API_URL/API_URL para a URL pública do Kanban, e use Traefik ou outro proxy em vez do gateway se preferir.
@@ -24,7 +27,8 @@ x-kanbancw-config: &kanbancw-config
   EVOLUTION_API_KEY: key_global_evolution
 
 configs:
-  kanbancw_gateway_conf:
+  # Renomeie o recurso (v2→v3…) sempre que alterar o arquivo; configs Swarm não podem ser atualizados in-place.
+  kanbancw_gateway_conf_v2:
     file: ./kanbancw-gateway.conf
 
 services:
@@ -35,7 +39,7 @@ services:
     networks:
       - minha_rede
     configs:
-      - source: kanbancw_gateway_conf
+      - source: kanbancw_gateway_conf_v2
         target: /etc/nginx/conf.d/default.conf
     deploy:
       mode: replicated
