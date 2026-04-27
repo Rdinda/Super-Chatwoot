@@ -12,6 +12,9 @@
 # Swarm: Docker Config é imutável. Se mudar kanbancw-gateway.conf e o deploy falhar com
 # "only updates to Labels are allowed", altere o nome em configs: (ex. kanbancw_gateway_conf_v3).
 #
+# DNS: o gateway usa os hostnames kanbancw_backend / kanbancw_frontend no Nginx. No Swarm, o nome
+# DNS padrão é <nome_do_stack>_<serviço>; aliases em minha_rede fixam esses hostnames para qualquer nome de stack.
+#
 # Produção (HTTPS + domínio): troque os valores do anchor (localhost → URLs reais), ajuste
 # VITE_API_URL/API_URL para a URL pública do Kanban, e use Traefik ou outro proxy em vez do gateway se preferir.
 #
@@ -72,7 +75,9 @@ services:
     volumes:
       - kanbancw-uploads:/app/uploads
     networks:
-      - minha_rede
+      minha_rede:
+        aliases:
+          - kanbancw_backend
     deploy:
       mode: replicated
       replicas: 1
@@ -94,7 +99,9 @@ services:
       - VITE_API_URL=http://localhost:8080
       - API_URL=http://localhost:8080
     networks:
-      - minha_rede
+      minha_rede:
+        aliases:
+          - kanbancw_frontend
     deploy:
       mode: replicated
       replicas: 1
